@@ -2,29 +2,24 @@
 
 import db from "../db/db.js";
 
-export async function singUp(req, res) {
-  const { name, email } = req.body;
-  const password = res.locals.password;
+export async function signUp(req, res) {
+  const { name, email, password } = res.locals;
 
-  const userBody = {
-    name: stripHtml(name).result.trim(),
-    email: stripHtml(email).result.trim(),
-    password,
-  };
+  console.log(res.locals.name);
 
   try {
     const query = `INSERT INTO
       users(name, email, password)
       VALUES($1, $2, $3)`;
-    const values = [userBody.name, userBody.email, userBody.password];
+    const values = [name, email, password];
 
     await db.query(query, values);
 
     res.sendStatus(201);
   } catch (error) {
     console.error("⚠ Error on user registration: ", error);
-    res.status(400).send(error.message);
+    res.status(422).send(error.message);
   }
 }
 
-export async function singIn(req, res) {}
+export async function signIn(req, res) {}
