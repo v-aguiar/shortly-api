@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 import signin_schema from "../schemas/signin_schema.js";
 import signup_schema from "../schemas/signup_schema.js";
+import db from "../db/db.js";
 
 dotenv.config();
 
@@ -44,7 +45,32 @@ export async function validateSignIn(req, res, next) {
     return;
   }
 
-  //TODO: check if user exists on DB
+  const query = `SELECT "id", "name", "email", "password" 
+    FROM users 
+    WHERE email = $1`;
+  const values = [email];
 
-  next();
+  try {
+    const existingUser = await db.query(query, values);
+    if (!existingUser.rows[0]) {
+      res.status(401).send("⚠ User not registered!");
+      return;
+    }
+
+    const isPasswordValid = bcrypt.compareSync(
+      password,
+      existingUser.rows[0].password
+    );
+    const isEmailValid = existingUser.rows[0].email === email;
+    if (!isPasswordValid || !isEmailValid) {
+      res.status(401).send("⚠ Invalid email or password!");
+      return;
+    }
+
+    res.locals.userId = existingUser.rows[0].id;
+    next();
+  } catch (error) {
+    console.error("⚠ Error on user login: ", error);
+    res.status(422).send(error.message);
+  }
 }
