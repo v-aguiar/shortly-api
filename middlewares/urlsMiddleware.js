@@ -1,4 +1,5 @@
 ﻿import url_schema from "../schemas/url_schema.js";
+import db from "../db/db.js";
 
 export async function validateUrlInput(req, res, next) {
   const { url } = req.body;
@@ -13,4 +14,40 @@ export async function validateUrlInput(req, res, next) {
   res.locals.userId = res.locals.userId.userId;
   res.locals.url = url;
   next();
+}
+
+export async function validateShortUrl(req, res, next) {
+  const { shortUrl } = req.params;
+
+  const checkQuery = `SELECT * FROM urls WHERE "shortUrl" = $1`;
+  const checkValues = [shortUrl];
+
+  const updateUrlViewsQuery = `UPDATE urls 
+    SET views = views + 1
+    WHERE "shortUrl" = $1`;
+  const updateUrlViewsValues = [shortUrl];
+
+  const updateUserViewsQuery = `UPDATE users
+  SET "visitedCount" = "visitedCount" + 1
+  FROM urls
+  WHERE users.id = urls."userId"`;
+
+  try {
+    const urlsDB = await db.query(checkQuery, checkValues);
+    const urls = urlsDB?.rows[0];
+    if (!urls) {
+      console.error("⚠ Url not found!");
+      res.status(404).send("⚠ Url not found!");
+      return;
+    }
+
+    await db.query(updateUrlViewsQuery, updateUrlViewsValues);
+    await db.query(updateUserViewsQuery);
+
+    res.locals.url = urls.url;
+    next();
+  } catch (error) {
+    console.error("⚠ Error validating url: ", error);
+    res.status(422).send(error.message);
+  }
 }

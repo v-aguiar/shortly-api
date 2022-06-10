@@ -1,8 +1,11 @@
 ﻿import { Router } from "express";
 
+import {
+  validateShortUrl,
+  validateUrlInput,
+} from "../middlewares/urlsMiddleware.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
-import { validateUrlInput } from "../middlewares/urlsMiddleware.js";
-import { shortifyUrl } from "../controllers/urlsController.js";
+import { redirectUrl, shortifyUrl } from "../controllers/urlsController.js";
 
 const urlRouter = Router();
 
@@ -12,5 +15,7 @@ urlRouter.post(
   validateUrlInput,
   shortifyUrl
 );
+
+urlRouter.get("/urls/open/:shortUrl", validateShortUrl, redirectUrl);
 
 export default urlRouter;
