@@ -32,5 +32,23 @@ export async function redirectUrl(req, res) {
 export async function fetchUrlData(req, res) {
   const { urlData } = res.locals;
 
+  delete urlData.userId;
   res.status(200).send(urlData);
+}
+
+export async function deleteUrl(req, res) {
+  const { userId, urlData } = res.locals;
+
+  const query = `DELETE FROM urls
+    WHERE "userId" = $1 AND "id" = $2`;
+  const values = [userId, urlData.id];
+
+  try {
+    await db.query(query, values);
+
+    res.status(204).send("Deleted!");
+  } catch (error) {
+    console.error("⚠ Error deleting url from DB: ", error);
+    res.status(400).send(error.message);
+  }
 }

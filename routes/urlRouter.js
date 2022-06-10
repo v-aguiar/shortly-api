@@ -1,11 +1,13 @@
 ﻿import { Router } from "express";
 
 import {
+  validateDeleteUrl,
   validateShortUrl,
   validateUrlId,
   validateUrlInput,
 } from "../middlewares/urlsMiddleware.js";
 import {
+  deleteUrl,
   fetchUrlData,
   redirectUrl,
   shortifyUrl,
@@ -20,8 +22,14 @@ urlRouter.post(
   validateUrlInput,
   shortifyUrl
 );
-
 urlRouter.get("/urls/open/:shortUrl", validateShortUrl, redirectUrl);
 urlRouter.get("/urls/:id", validateUrlId, fetchUrlData);
+urlRouter.delete(
+  "/urls/:id",
+  authenticateToken,
+  validateUrlId,
+  validateDeleteUrl,
+  deleteUrl
+);
 
 export default urlRouter;

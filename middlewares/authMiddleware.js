@@ -86,7 +86,7 @@ export async function authenticateToken(req, res, next) {
   }
 
   try {
-    const userId = jwt.verify(token, process.env.JWT_SECRET);
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
     res.locals.userId = userId;
     next();
   } catch (error) {

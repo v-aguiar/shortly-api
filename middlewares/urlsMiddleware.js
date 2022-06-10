@@ -11,7 +11,6 @@ export async function validateUrlInput(req, res, next) {
     return;
   }
 
-  res.locals.userId = res.locals.userId.userId;
   res.locals.url = url;
   next();
 }
@@ -55,7 +54,9 @@ export async function validateShortUrl(req, res, next) {
 export async function validateUrlId(req, res, next) {
   const { id } = req.params;
 
-  const query = `SELECT "id", "shortUrl", "url" FROM urls WHERE "id" = $1`;
+  const query = `SELECT "id", "shortUrl", "url", "userId" 
+    FROM urls 
+    WHERE "id" = $1`;
   const values = [id];
 
   try {
@@ -73,4 +74,16 @@ export async function validateUrlId(req, res, next) {
     console.error("⚠ No url found with given id: ", error);
     res.status(404).send(error.message);
   }
+}
+
+export async function validateDeleteUrl(req, res, next) {
+  const { userId, urlData } = res.locals;
+
+  if (userId !== urlData.userId) {
+    console.error("⚠ User is not authorized to delete url!");
+    res.status(401).send("⚠ User is not authorized to delete url!");
+    return;
+  }
+
+  next();
 }
