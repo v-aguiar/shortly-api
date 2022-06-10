@@ -12,7 +12,7 @@ export async function fetchRanking(req, res) {
     LEFT JOIN urls
     ON urls."userId" = users."id"
     GROUP BY users."id"
-    ORDER BY "linksCount" DESC, "visitCount" DESC
+    ORDER BY "visitCount" DESC
     LIMIT 10`;
 
   try {
