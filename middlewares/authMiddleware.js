@@ -1,4 +1,5 @@
 ﻿import { stripHtml } from "string-strip-html";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
@@ -72,5 +73,24 @@ export async function validateSignIn(req, res, next) {
   } catch (error) {
     console.error("⚠ Error on user login: ", error);
     res.status(422).send(error.message);
+  }
+}
+
+export async function authenticateToken(req, res, next) {
+  const { authorization } = req.headers;
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    res.status(401).send("⚠ Unauthorized! Token must be provided...");
+    return;
+  }
+
+  try {
+    const userId = jwt.verify(token, process.env.JWT_SECRET);
+    res.locals.userId = userId;
+    next();
+  } catch (error) {
+    console.error("⚠ Authentication error: ", error);
+    res.status(401).send(error.message);
   }
 }
