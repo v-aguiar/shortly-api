@@ -2,10 +2,15 @@
 
 import {
   validateShortUrl,
+  validateUrlId,
   validateUrlInput,
 } from "../middlewares/urlsMiddleware.js";
+import {
+  fetchUrlData,
+  redirectUrl,
+  shortifyUrl,
+} from "../controllers/urlsController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
-import { redirectUrl, shortifyUrl } from "../controllers/urlsController.js";
 
 const urlRouter = Router();
 
@@ -17,5 +22,6 @@ urlRouter.post(
 );
 
 urlRouter.get("/urls/open/:shortUrl", validateShortUrl, redirectUrl);
+urlRouter.get("/urls/:id", validateUrlId, fetchUrlData);
 
 export default urlRouter;

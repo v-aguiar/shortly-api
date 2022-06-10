@@ -51,3 +51,26 @@ export async function validateShortUrl(req, res, next) {
     res.status(422).send(error.message);
   }
 }
+
+export async function validateUrlId(req, res, next) {
+  const { id } = req.params;
+
+  const query = `SELECT "id", "shortUrl", "url" FROM urls WHERE "id" = $1`;
+  const values = [id];
+
+  try {
+    const urlDB = await db.query(query, values);
+    const urlData = urlDB?.rows[0];
+    if (!urlData) {
+      console.error("⚠ No url found with given id!");
+      res.status(404).send("⚠ No url found with given id!");
+      return;
+    }
+
+    res.locals.urlData = urlData;
+    next();
+  } catch (error) {
+    console.error("⚠ No url found with given id: ", error);
+    res.status(404).send(error.message);
+  }
+}

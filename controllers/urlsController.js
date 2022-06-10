@@ -28,3 +28,9 @@ export async function redirectUrl(req, res) {
 
   res.redirect(302, url);
 }
+
+export async function fetchUrlData(req, res) {
+  const { urlData } = res.locals;
+
+  res.status(200).send(urlData);
+}
