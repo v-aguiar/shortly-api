@@ -10,12 +10,12 @@ import db from "../db/db.js";
 dotenv.config();
 
 export async function validateSignUp(req, res, next) {
-  const { name, email, password, confirm_password } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
   const userBody = {
     name: stripHtml(name).result.trim(),
     email: stripHtml(email).result.trim(),
     password: stripHtml(password).result.trim(),
-    confirm_password: stripHtml(confirm_password).result.trim(),
+    confirmPassword: stripHtml(confirmPassword).result.trim(),
   };
 
   const validateInputs = signup_schema.validate(userBody, {
