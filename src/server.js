@@ -4,7 +4,7 @@ import cors from "cors";
 import chalk from "chalk";
 import dotenv from "dotenv";
 
-import router from "../routes/router.js";
+import router from "./routes/router.js";
 
 const server = express();
 
